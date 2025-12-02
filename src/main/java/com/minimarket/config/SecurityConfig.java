@@ -23,6 +23,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/h2-console/**").permitAll() // Allow H2 console
+                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll() // Allow static resources
                 .anyRequest().authenticated()
             )
             .formLogin((form) -> form

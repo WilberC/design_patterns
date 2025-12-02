@@ -2,100 +2,72 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <title>Manage Transactions</title>
-    <style>
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f9;
-      }
-      header {
-        background-color: #343a40;
-        color: white;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .container {
-        padding: 2rem;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-      }
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      th {
-        background-color: #343a40;
-        color: white;
-      }
-      .btn {
-        padding: 0.5rem 1rem;
-        text-decoration: none;
-        border-radius: 4px;
-        color: white;
-      }
-      .btn-primary {
-        background-color: #007bff;
-      }
-      .home-link {
-        color: white;
-        text-decoration: none;
-        margin-right: 1rem;
-      }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
   </head>
   <body>
     <header>
-      <div>
-        <a th:href="@{/}" class="home-link">Home</a>
-        <span>Manage Transactions</span>
+      <div class="container">
+        <div>
+          <a
+            th:href="@{/}"
+            style="color: white; margin-right: 1rem; font-weight: bold"
+            >Home</a
+          >
+          <span>Manage Transactions</span>
+        </div>
       </div>
     </header>
     <div class="container">
-      <h2>Transaction History</h2>
-      <a th:href="@{/transactions/new}" class="btn btn-primary"
-        >New Transaction</a
-      >
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Total</th>
-            <th>Extra Info</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="transaction : ${transactions}">
-            <td th:text="${transaction.id}">1</td>
-            <td th:text="${transaction.date}">2023-10-01</td>
-            <td th:text="${transaction.class.simpleName}">Purchase</td>
-            <td th:text="${transaction.product.name}">Apple</td>
-            <td th:text="${transaction.quantity}">10</td>
-            <td th:text="${transaction.total}">15.00</td>
-            <td>
-              <span
-                th:if="${transaction.class.simpleName == 'Purchase'}"
-                th:text="'Supplier: ' + ${transaction.supplier}"
-              ></span>
-              <span
-                th:if="${transaction.class.simpleName == 'Sale'}"
-                th:text="'Customer: ' + ${transaction.customer}"
-              ></span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+          "
+        >
+          <h2>Transaction History</h2>
+          <a th:href="@{/transactions/new}" class="btn btn-primary"
+            >New Transaction</a
+          >
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Extra Info</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="transaction : ${transactions}">
+                <td th:text="${transaction.id}">1</td>
+                <td th:text="${transaction.date}">2023-10-01</td>
+                <td th:text="${transaction.class.simpleName}">Purchase</td>
+                <td th:text="${transaction.product.name}">Apple</td>
+                <td th:text="${transaction.quantity}">10</td>
+                <td th:text="${transaction.total}">15.00</td>
+                <td>
+                  <span
+                    th:if="${transaction.class.simpleName == 'Purchase'}"
+                    th:text="'Supplier: ' + ${transaction.supplier}"
+                  ></span>
+                  <span
+                    th:if="${transaction.class.simpleName == 'Sale'}"
+                    th:text="'Customer: ' + ${transaction.customer}"
+                  ></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </body>
 </html>
