@@ -11,33 +11,136 @@ This project is a web-based Minimarket administration platform built with Java a
 
 ## Architecture & Design Patterns
 
-This project strictly follows software engineering best practices:
+This project is designed to be a reference implementation for clean architecture and design patterns in Java/Spring Boot. Below is a detailed breakdown of how each principle and pattern is applied.
 
 ### SOLID Principles
 
-- **SRP**: Classes like `StockUpdater` and `ReportGenerator` have single responsibilities.
-- **OCP**: New pricing strategies or report formats can be added without modifying core logic.
-- **LSP**: `Purchase` and `Sale` are interchangeable subclasses of `Transaction`.
-- **ISP**: Interfaces like `PricingStrategy` are specific and focused.
-- **DIP**: High-level services depend on abstractions (`StockObserver`, `ReportFormatter`), not concrete implementations.
+| Principle                       | Applied In           | Example in Code                                                                                          | Why it's good here                                                        |
+| :------------------------------ | :------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| **SRP** (Single Responsibility) | `StockUpdater`       | `StockUpdater` only handles inventory updates. It doesn't know about HTTP requests or report formatting. | If logic for updating stock changes, we only touch this class.            |
+| **OCP** (Open/Closed)           | `PricingStrategy`    | We can add a `HolidayPricingStrategy` without modifying `TransactionService`.                            | Reduces risk of bugs in existing, tested code when adding features.       |
+| **LSP** (Liskov Substitution)   | `Transaction`        | `Purchase` and `Sale` can be used wherever `Transaction` is expected.                                    | Simplifies polymorphism in `TransactionRepository` and `ReportGenerator`. |
+| **ISP** (Interface Segregation) | `PricingStrategy`    | The interface only has `calculateTotal`, not unrelated methods like `printReceipt`.                      | Implementations aren't forced to depend on methods they don't use.        |
+| **DIP** (Dependency Inversion)  | `TransactionService` | Depends on `StockObserver` (interface), not `StockUpdater` (concrete class).                             | Decouples business logic from specific implementation details.            |
 
 ### GoF Patterns Implemented
 
-| Category       | Pattern             | Usage                                                                                |
-| :------------- | :------------------ | :----------------------------------------------------------------------------------- |
-| **Creational** | **Builder**         | Construction of complex `Product` objects.                                           |
-|                | **Factory Method**  | Creating `Purchase` or `Sale` transactions based on type.                            |
-| **Structural** | **Facade**          | `MinimarketFacade` simplifies the interface between Controllers and Services.        |
-|                | **Bridge**          | Decouples `ReportGenerator` (Abstraction) from `ReportFormatter` (Implementation).   |
-| **Behavioral** | **Strategy**        | `PricingStrategy` handles different pricing logic (Regular vs Discount).             |
-|                | **Observer**        | `StockUpdater` observes transactions to automatically update inventory.              |
-|                | **Template Method** | `ReportGenerator` defines the report structure, delegating formatting to the Bridge. |
+#### 1. Behavioral Patterns
 
-### GRASP
+**Strategy Pattern**
 
-- **Controller**: Dedicated controllers for Products, Transactions, and Reports.
-- **Information Expert**: Domain objects and strategies contain their own logic.
-- **Low Coupling & High Cohesion**: Achieved through the use of Facades and Interfaces.
+- **Context**: `TransactionService` needs to calculate prices differently (e.g., Regular vs. Discount).
+- **Implementation**: `PricingStrategy` interface with `RegularPricingStrategy` and `DiscountPricingStrategy`.
+- **Benefit**: Eliminates complex `if-else` logic in the service.
+
+```mermaid
+classDiagram
+    class TransactionService {
+        +createTransaction()
+    }
+    class PricingStrategy {
+        <<interface>>
+        +calculateTotal()
+    }
+    class RegularPricingStrategy {
+        +calculateTotal()
+    }
+    class DiscountPricingStrategy {
+        +calculateTotal()
+    }
+    TransactionService --> PricingStrategy : uses
+    PricingStrategy <|.. RegularPricingStrategy : implements
+    PricingStrategy <|.. DiscountPricingStrategy : implements
+```
+
+**Observer Pattern**
+
+- **Subject**: `TransactionService`.
+- **Observer**: `StockObserver`.
+- **Implementation**: When a transaction is saved, `TransactionService` notifies all `StockObserver`s. `StockUpdater` (an observer) then updates the product inventory.
+- **Benefit**: Decouples the transaction processing from side effects like stock updates.
+
+```mermaid
+classDiagram
+    class TransactionService {
+        +createTransaction()
+        -notifyObservers()
+    }
+    class StockObserver {
+        <<interface>>
+        +onTransaction()
+    }
+    class StockUpdater {
+        +onTransaction()
+    }
+    TransactionService --> StockObserver : notifies
+    StockObserver <|.. StockUpdater : implements
+```
+
+**Template Method Pattern**
+
+- **Context**: Generating reports requires a standard structure (Header -> Rows -> Footer) but variable content.
+- **Implementation**: `ReportGenerator` defines the `generateReport` flow (final method) and delegates specific steps (`getHeaderLabels`, `getRowData`) to subclasses like `TransactionReportGenerator`.
+- **Benefit**: Enforces a consistent report structure while allowing customization.
+
+#### 2. Structural Patterns
+
+**Bridge Pattern**
+
+- **Context**: We need to generate reports in different formats (CSV, HTML) without exploding the class hierarchy (e.g., `HtmlTransactionReport`, `CsvTransactionReport`).
+- **Implementation**: `ReportGenerator` (Abstraction) holds a reference to `ReportFormatter` (Implementation).
+- **Benefit**: We can add new report types (PDF) or new generators (ProductReport) independently.
+
+```mermaid
+classDiagram
+    class ReportGenerator {
+        <<abstract>>
+        +generateReport()
+    }
+    class ReportFormatter {
+        <<interface>>
+        +formatHeader()
+        +formatRow()
+    }
+    class CsvReportFormatter {
+        +formatHeader()
+    }
+    class HtmlReportFormatter {
+        +formatHeader()
+    }
+    ReportGenerator --> ReportFormatter : uses (Bridge)
+    ReportFormatter <|.. CsvReportFormatter : implements
+    ReportFormatter <|.. HtmlReportFormatter : implements
+```
+
+**Facade Pattern**
+
+- **Context**: The Controller layer shouldn't deal with the complexity of multiple services (Product, Transaction, Report).
+- **Implementation**: `MinimarketFacade` provides a simple interface for the controllers, delegating calls to the appropriate services.
+- **Benefit**: Reduces coupling between the web layer and the business layer.
+
+#### 3. Creational Patterns
+
+**Factory Method**
+
+- **Context**: Creating `Purchase` or `Sale` transactions involves different initialization logic.
+- **Implementation**: `TransactionFactory` decides which entity to instantiate based on the type string.
+- **Benefit**: Centralizes object creation logic.
+
+**Builder Pattern**
+
+- **Context**: `Product` objects have many attributes (code, name, price, stock).
+- **Implementation**: `Product.Builder` allows readable and safe object construction.
+- **Benefit**: Avoids constructors with long lists of parameters (`new Product(null, "A", "B", 10.0, 5)`).
+
+### GRASP Principles
+
+- **Controller**: `ProductController`, `TransactionController` handle UI events and delegate to the Facade.
+- **Information Expert**: `Product` holds its own data; `PricingStrategy` holds the logic for calculation. The object with the information does the work.
+- **Low Coupling**: `TransactionService` doesn't know about `StockUpdater` directly, only the `StockObserver` interface.
+- **High Cohesion**: `ReportService` focuses solely on reporting; it doesn't handle stock updates or user login.
+- **Polymorphism**: Used extensively in `PricingStrategy` and `ReportFormatter` to handle variations without type checking.
+- **Pure Fabrication**: `TransactionFactory` and `ReportFormatter` are not domain concepts but are created to support high cohesion and low coupling.
 
 ## Prerequisites
 
