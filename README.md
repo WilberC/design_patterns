@@ -216,3 +216,5 @@ El proyecto incluye pruebas unitarias para la capa de servicio central, verifica
 - **CustomUserDetailsServiceTest**: Prueba la lógica de autenticación de usuarios.
 - **ProductTest**: Prueba el patrón **Builder** para crear instancias de productos.
 - **TransactionFactoryTest**: Verifica el patrón **Factory Method** para crear diferentes tipos de transacciones.
+
+<img width="1174" height="320" alt="Image" src="https://github.com/user-attachments/assets/4aed5616-79aa-48c9-9100-9a930b2cd9c0" />

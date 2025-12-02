@@ -216,3 +216,5 @@ The project includes unit tests for the core service layer, verifying the correc
 - **CustomUserDetailsServiceTest**: Tests user authentication logic.
 - **ProductTest**: Tests the **Builder** pattern for creating product instances.
 - **TransactionFactoryTest**: Verifies the **Factory Method** pattern for creating different transaction types.
+
+<img width="1174" height="320" alt="Image" src="https://github.com/user-attachments/assets/4aed5616-79aa-48c9-9100-9a930b2cd9c0" />
