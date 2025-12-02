@@ -42,9 +42,11 @@
       <h2>Welcome, Admin!</h2>
       <p>Select an option to proceed:</p>
       <ul>
-        <li><a href="#">Manage Inventory</a></li>
-        <li><a href="#">Sales Report</a></li>
-        <li><a href="#">Purchase Report</a></li>
+        <li><a th:href="@{/products}">Manage Inventory (Products)</a></li>
+        <li>
+          <a th:href="@{/transactions}">Manage Transactions (Purchase/Sale)</a>
+        </li>
+        <li><a th:href="@{/reports}">Generate Reports</a></li>
       </ul>
     </div>
   </body>

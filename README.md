@@ -1,6 +1,43 @@
 # Minimarket Design Patterns Project
 
-This project is a web-based Minimarket administration platform built with Java and Spring Boot. It demonstrates the application of SOLID principles, GoF patterns, and GRASP.
+This project is a web-based Minimarket administration platform built with Java and Spring Boot. It demonstrates the application of **SOLID principles**, **GoF patterns**, and **GRASP** to solve real-world business problems like inventory management, transactions, and reporting.
+
+## Features
+
+- **Inventory Management**: Create, list, and delete products.
+- **Transactions**: Record **Purchases** (stock entry) and **Sales** (stock exit) with automatic stock updates.
+- **Reporting**: Generate transaction reports in **CSV** or **HTML** formats.
+- **Authentication**: Secure login for admin access.
+
+## Architecture & Design Patterns
+
+This project strictly follows software engineering best practices:
+
+### SOLID Principles
+
+- **SRP**: Classes like `StockUpdater` and `ReportGenerator` have single responsibilities.
+- **OCP**: New pricing strategies or report formats can be added without modifying core logic.
+- **LSP**: `Purchase` and `Sale` are interchangeable subclasses of `Transaction`.
+- **ISP**: Interfaces like `PricingStrategy` are specific and focused.
+- **DIP**: High-level services depend on abstractions (`StockObserver`, `ReportFormatter`), not concrete implementations.
+
+### GoF Patterns Implemented
+
+| Category       | Pattern             | Usage                                                                                |
+| :------------- | :------------------ | :----------------------------------------------------------------------------------- |
+| **Creational** | **Builder**         | Construction of complex `Product` objects.                                           |
+|                | **Factory Method**  | Creating `Purchase` or `Sale` transactions based on type.                            |
+| **Structural** | **Facade**          | `MinimarketFacade` simplifies the interface between Controllers and Services.        |
+|                | **Bridge**          | Decouples `ReportGenerator` (Abstraction) from `ReportFormatter` (Implementation).   |
+| **Behavioral** | **Strategy**        | `PricingStrategy` handles different pricing logic (Regular vs Discount).             |
+|                | **Observer**        | `StockUpdater` observes transactions to automatically update inventory.              |
+|                | **Template Method** | `ReportGenerator` defines the report structure, delegating formatting to the Bridge. |
+
+### GRASP
+
+- **Controller**: Dedicated controllers for Products, Transactions, and Reports.
+- **Information Expert**: Domain objects and strategies contain their own logic.
+- **Low Coupling & High Cohesion**: Achieved through the use of Facades and Interfaces.
 
 ## Prerequisites
 
@@ -40,18 +77,21 @@ The system is pre-configured with a single admin user:
 - **Username:** `admin`
 - **Password:** `admin123`
 
-## Database & Migrations
+## Database
 
-This project uses **H2 Database** (In-Memory) for development simplicity.
+This project uses **SQLite** for persistence.
 
-- **Database Console:** [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
-- **JDBC URL:** `jdbc:h2:mem:minimarket`
-- **User:** `sa`
-- **Password:** `password`
+- **Database File:** `minimarket.db` (created in the project root)
+- **JDBC URL:** `jdbc:sqlite:minimarket.db`
+- **Dialect:** `org.hibernate.community.dialect.SQLiteDialect`
 
-### Migrations
+## Project Structure
 
-Currently, the database schema is automatically managed by Hibernate (`spring.jpa.hibernate.ddl-auto=update`). No manual migration scripts are required for this phase. The schema is recreated/updated on every application startup.
+- `src/main/java/com/minimarket/model`: Domain entities (Product, Transaction).
+- `src/main/java/com/minimarket/service`: Business logic and Pattern implementations (Strategy, Observer, Factory).
+- `src/main/java/com/minimarket/controller`: Web controllers.
+- `src/main/java/com/minimarket/service/facade`: Facade pattern entry point.
+- `src/main/resources/templates`: Thymeleaf views.
 
 ## Testing
 
@@ -60,9 +100,3 @@ To run the automated tests:
 ```bash
 ./mvnw test
 ```
-
-## Project Structure
-
-- `src/main/java`: Source code
-- `src/main/resources`: Configuration and templates
-- `src/test/java`: Unit and integration tests

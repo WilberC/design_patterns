@@ -53,13 +53,15 @@ public class SecurityConfig {
     @Bean
     public CommandLineRunner initData(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (userRepository.findByUsername("admin").isEmpty()) {
-                User admin = new User();
-                admin.setUsername("admin");
-                admin.setPassword(passwordEncoder.encode("admin123"));
-                admin.setRole("ADMIN");
-                userRepository.save(admin);
-            }
+            User admin = userRepository.findByUsername("admin").orElseGet(() -> {
+                User newUser = new User();
+                newUser.setUsername("admin");
+                return newUser;
+            });
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setRole("ADMIN");
+            userRepository.save(admin);
+            System.out.println("Admin user updated/created: admin / admin123");
         };
     }
 }
