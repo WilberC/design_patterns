@@ -1,37 +1,39 @@
-# Minimarket Design Patterns Project
+> **Nota:** Este documento también está disponible en [Inglés](README-en.md).
 
-This project is a web-based Minimarket administration platform built with Java and Spring Boot. It demonstrates the application of **SOLID principles**, **GoF patterns**, and **GRASP** to solve real-world business problems like inventory management, transactions, and reporting.
+# Proyecto de Patrones de Diseño Minimarket
 
-## Features
+Este proyecto es una plataforma de administración de Minimarket basada en web construida con Java y Spring Boot. Demuestra la aplicación de **principios SOLID**, **patrones GoF** y **GRASP** para resolver problemas de negocio del mundo real como la gestión de inventario, transacciones y reportes.
 
-- **Inventory Management**: Create, list, and delete products.
-- **Transactions**: Record **Purchases** (stock entry) and **Sales** (stock exit) with automatic stock updates.
-- **Reporting**: Generate transaction reports in **CSV** or **HTML** formats.
-- **Authentication**: Secure login for admin access.
+## Características
 
-## Architecture & Design Patterns
+- **Gestión de Inventario**: Crear, listar y eliminar productos.
+- **Transacciones**: Registrar **Compras** (entrada de stock) y **Ventas** (salida de stock) con actualizaciones automáticas de stock.
+- **Reportes**: Generar reportes de transacciones en formatos **CSV** o **HTML**.
+- **Autenticación**: Inicio de sesión seguro para acceso de administrador.
 
-This project is designed to be a reference implementation for clean architecture and design patterns in Java/Spring Boot. Below is a detailed breakdown of how each principle and pattern is applied.
+## Arquitectura y Patrones de Diseño
 
-### SOLID Principles
+Este proyecto está diseñado para ser una implementación de referencia para arquitectura limpia y patrones de diseño en Java/Spring Boot. A continuación se detalla cómo se aplica cada principio y patrón.
 
-| Principle                       | Applied In           | Example in Code                                                                                          | Why it's good here                                                        |
-| :------------------------------ | :------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
-| **SRP** (Single Responsibility) | `StockUpdater`       | `StockUpdater` only handles inventory updates. It doesn't know about HTTP requests or report formatting. | If logic for updating stock changes, we only touch this class.            |
-| **OCP** (Open/Closed)           | `PricingStrategy`    | We can add a `HolidayPricingStrategy` without modifying `TransactionService`.                            | Reduces risk of bugs in existing, tested code when adding features.       |
-| **LSP** (Liskov Substitution)   | `Transaction`        | `Purchase` and `Sale` can be used wherever `Transaction` is expected.                                    | Simplifies polymorphism in `TransactionRepository` and `ReportGenerator`. |
-| **ISP** (Interface Segregation) | `PricingStrategy`    | The interface only has `calculateTotal`, not unrelated methods like `printReceipt`.                      | Implementations aren't forced to depend on methods they don't use.        |
-| **DIP** (Dependency Inversion)  | `TransactionService` | Depends on `StockObserver` (interface), not `StockUpdater` (concrete class).                             | Decouples business logic from specific implementation details.            |
+### Principios SOLID
 
-### GoF Patterns Implemented
+| Principio                          | Aplicado En          | Ejemplo en Código                                                                                               | Por qué es bueno aquí                                                           |
+| :--------------------------------- | :------------------- | :-------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| **SRP** (Responsabilidad Única)    | `StockUpdater`       | `StockUpdater` solo maneja actualizaciones de inventario. No sabe sobre solicitudes HTTP o formato de reportes. | Si la lógica para actualizar el stock cambia, solo tocamos esta clase.          |
+| **OCP** (Abierto/Cerrado)          | `PricingStrategy`    | Podemos agregar una `HolidayPricingStrategy` sin modificar `TransactionService`.                                | Reduce el riesgo de errores en código existente y probado al agregar funciones. |
+| **LSP** (Sustitución de Liskov)    | `Transaction`        | `Purchase` y `Sale` pueden usarse donde se espere `Transaction`.                                                | Simplifica el polimorfismo en `TransactionRepository` y `ReportGenerator`.      |
+| **ISP** (Segregación de Interfaz)  | `PricingStrategy`    | La interfaz solo tiene `calculateTotal`, no métodos no relacionados como `printReceipt`.                        | Las implementaciones no están forzadas a depender de métodos que no usan.       |
+| **DIP** (Inversión de Dependencia) | `TransactionService` | Depende de `StockObserver` (interfaz), no de `StockUpdater` (clase concreta).                                   | Desacopla la lógica de negocio de los detalles de implementación específicos.   |
 
-#### 1. Behavioral Patterns
+### Patrones GoF Implementados
 
-**Strategy Pattern**
+#### 1. Patrones de Comportamiento
 
-- **Context**: `TransactionService` needs to calculate prices differently (e.g., Regular vs. Discount).
-- **Implementation**: `PricingStrategy` interface with `RegularPricingStrategy` and `DiscountPricingStrategy`.
-- **Benefit**: Eliminates complex `if-else` logic in the service.
+**Patrón Strategy**
+
+- **Contexto**: `TransactionService` necesita calcular precios de manera diferente (ej. Regular vs. Descuento).
+- **Implementación**: Interfaz `PricingStrategy` con `RegularPricingStrategy` y `DiscountPricingStrategy`.
+- **Beneficio**: Elimina lógica compleja `if-else` en el servicio.
 
 ```mermaid
 classDiagram
@@ -48,17 +50,17 @@ classDiagram
     class DiscountPricingStrategy {
         +calculateTotal()
     }
-    TransactionService --> PricingStrategy : uses
-    PricingStrategy <|.. RegularPricingStrategy : implements
-    PricingStrategy <|.. DiscountPricingStrategy : implements
+    TransactionService --> PricingStrategy : usa
+    PricingStrategy <|.. RegularPricingStrategy : implementa
+    PricingStrategy <|.. DiscountPricingStrategy : implementa
 ```
 
-**Observer Pattern**
+**Patrón Observer**
 
-- **Subject**: `TransactionService`.
-- **Observer**: `StockObserver`.
-- **Implementation**: When a transaction is saved, `TransactionService` notifies all `StockObserver`s. `StockUpdater` (an observer) then updates the product inventory.
-- **Benefit**: Decouples the transaction processing from side effects like stock updates.
+- **Sujeto**: `TransactionService`.
+- **Observador**: `StockObserver`.
+- **Implementación**: Cuando se guarda una transacción, `TransactionService` notifica a todos los `StockObserver`s. `StockUpdater` (un observador) luego actualiza el inventario de productos.
+- **Beneficio**: Desacopla el procesamiento de transacciones de efectos secundarios como actualizaciones de stock.
 
 ```mermaid
 classDiagram
@@ -73,23 +75,23 @@ classDiagram
     class StockUpdater {
         +onTransaction()
     }
-    TransactionService --> StockObserver : notifies
-    StockObserver <|.. StockUpdater : implements
+    TransactionService --> StockObserver : notifica
+    StockObserver <|.. StockUpdater : implementa
 ```
 
-**Template Method Pattern**
+**Patrón Template Method**
 
-- **Context**: Generating reports requires a standard structure (Header -> Rows -> Footer) but variable content.
-- **Implementation**: `ReportGenerator` defines the `generateReport` flow (final method) and delegates specific steps (`getHeaderLabels`, `getRowData`) to subclasses like `TransactionReportGenerator`.
-- **Benefit**: Enforces a consistent report structure while allowing customization.
+- **Contexto**: Generar reportes requiere una estructura estándar (Encabezado -> Filas -> Pie) pero contenido variable.
+- **Implementación**: `ReportGenerator` define el flujo `generateReport` (método final) y delega pasos específicos (`getHeaderLabels`, `getRowData`) a subclases como `TransactionReportGenerator`.
+- **Beneficio**: Impone una estructura de reporte consistente mientras permite personalización.
 
-#### 2. Structural Patterns
+#### 2. Patrones Estructurales
 
-**Bridge Pattern**
+**Patrón Bridge**
 
-- **Context**: We need to generate reports in different formats (CSV, HTML) without exploding the class hierarchy (e.g., `HtmlTransactionReport`, `CsvTransactionReport`).
-- **Implementation**: `ReportGenerator` (Abstraction) holds a reference to `ReportFormatter` (Implementation).
-- **Benefit**: We can add new report types (PDF) or new generators (ProductReport) independently.
+- **Contexto**: Necesitamos generar reportes en diferentes formatos (CSV, HTML) sin explotar la jerarquía de clases (ej. `HtmlTransactionReport`, `CsvTransactionReport`).
+- **Implementación**: `ReportGenerator` (Abstracción) mantiene una referencia a `ReportFormatter` (Implementación).
+- **Beneficio**: Podemos agregar nuevos tipos de reportes (PDF) o nuevos generadores (ProductReport) independientemente.
 
 ```mermaid
 classDiagram
@@ -108,109 +110,109 @@ classDiagram
     class HtmlReportFormatter {
         +formatHeader()
     }
-    ReportGenerator --> ReportFormatter : uses (Bridge)
-    ReportFormatter <|.. CsvReportFormatter : implements
-    ReportFormatter <|.. HtmlReportFormatter : implements
+    ReportGenerator --> ReportFormatter : usa (Bridge)
+    ReportFormatter <|.. CsvReportFormatter : implementa
+    ReportFormatter <|.. HtmlReportFormatter : implementa
 ```
 
-**Facade Pattern**
+**Patrón Facade**
 
-- **Context**: The Controller layer shouldn't deal with the complexity of multiple services (Product, Transaction, Report).
-- **Implementation**: `MinimarketFacade` provides a simple interface for the controllers, delegating calls to the appropriate services.
-- **Benefit**: Reduces coupling between the web layer and the business layer.
+- **Contexto**: La capa de Controlador no debería lidiar con la complejidad de múltiples servicios (Producto, Transacción, Reporte).
+- **Implementación**: `MinimarketFacade` proporciona una interfaz simple para los controladores, delegando llamadas a los servicios apropiados.
+- **Beneficio**: Reduce el acoplamiento entre la capa web y la capa de negocio.
 
-#### 3. Creational Patterns
+#### 3. Patrones Creacionales
 
-**Factory Method**
+**Patrón Factory Method**
 
-- **Context**: Creating `Purchase` or `Sale` transactions involves different initialization logic.
-- **Implementation**: `TransactionFactory` decides which entity to instantiate based on the type string.
-- **Benefit**: Centralizes object creation logic.
+- **Contexto**: Crear transacciones de `Purchase` o `Sale` implica lógica de inicialización diferente.
+- **Implementación**: `TransactionFactory` decide qué entidad instanciar basado en la cadena de tipo.
+- **Beneficio**: Centraliza la lógica de creación de objetos.
 
-**Builder Pattern**
+**Patrón Builder**
 
-- **Context**: `Product` objects have many attributes (code, name, price, stock).
-- **Implementation**: `Product.Builder` allows readable and safe object construction.
-- **Benefit**: Avoids constructors with long lists of parameters (`new Product(null, "A", "B", 10.0, 5)`).
+- **Contexto**: Los objetos `Product` tienen muchos atributos (código, nombre, precio, stock).
+- **Implementación**: `Product.Builder` permite una construcción de objetos legible y segura.
+- **Beneficio**: Evita constructores con largas listas de parámetros (`new Product(null, "A", "B", 10.0, 5)`).
 
-### GRASP Principles
+### Principios GRASP
 
-- **Controller**: `ProductController`, `TransactionController` handle UI events and delegate to the Facade.
-- **Information Expert**: `Product` holds its own data; `PricingStrategy` holds the logic for calculation. The object with the information does the work.
-- **Low Coupling**: `TransactionService` doesn't know about `StockUpdater` directly, only the `StockObserver` interface.
-- **High Cohesion**: `ReportService` focuses solely on reporting; it doesn't handle stock updates or user login.
-- **Polymorphism**: Used extensively in `PricingStrategy` and `ReportFormatter` to handle variations without type checking.
-- **Pure Fabrication**: `TransactionFactory` and `ReportFormatter` are not domain concepts but are created to support high cohesion and low coupling.
+- **Controlador**: `ProductController`, `TransactionController` manejan eventos de UI y delegan a la Facade.
+- **Experto en Información**: `Product` mantiene sus propios datos; `PricingStrategy` mantiene la lógica para el cálculo. El objeto con la información hace el trabajo.
+- **Bajo Acoplamiento**: `TransactionService` no sabe sobre `StockUpdater` directamente, solo la interfaz `StockObserver`.
+- **Alta Cohesión**: `ReportService` se enfoca únicamente en reportes; no maneja actualizaciones de stock o inicio de sesión de usuarios.
+- **Polimorfismo**: Usado extensamente en `PricingStrategy` y `ReportFormatter` para manejar variaciones sin verificación de tipos.
+- **Fabricación Pura**: `TransactionFactory` y `ReportFormatter` no son conceptos de dominio pero son creados para soportar alta cohesión y bajo acoplamiento.
 
-## Prerequisites
+## Prerrequisitos
 
-- **Java 17** or higher
-- **Maven 3.6** or higher (or use the included `mvnw` wrapper)
+- **Java 17** o superior
+- **Maven 3.6** o superior (o use el wrapper `mvnw` incluido)
 
-## Installation
+## Instalación
 
-1. **Clone the repository:**
+1. **Clonar el repositorio:**
 
    ```bash
    git clone <repository-url>
    cd design_patterns
    ```
 
-2. **Install dependencies:**
+2. **Instalar dependencias:**
    ```bash
    ./mvnw clean install
    ```
 
-## Running the Application
+## Ejecutando la Aplicación
 
-To start the application, run the following command in the project root:
+Para iniciar la aplicación, ejecute el siguiente comando en la raíz del proyecto:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-The application will start on port `8080`.
+La aplicación iniciará en el puerto `8080`.
 
 - **URL:** [http://localhost:8080](http://localhost:8080)
 
-## Login Credentials
+## Credenciales de Acceso
 
-The system is pre-configured with a single admin user:
+El sistema está pre-configurado con un único usuario administrador:
 
-- **Username:** `admin`
-- **Password:** `admin123`
+- **Usuario:** `admin`
+- **Contraseña:** `admin123`
 
-## Database
+## Base de Datos
 
-This project uses **SQLite** for persistence.
+Este proyecto usa **SQLite** para persistencia.
 
-- **Database File:** `minimarket.db` (created in the project root)
-- **JDBC URL:** `jdbc:sqlite:minimarket.db`
-- **Dialect:** `org.hibernate.community.dialect.SQLiteDialect`
+- **Archivo de Base de Datos:** `minimarket.db` (creado en la raíz del proyecto)
+- **URL JDBC:** `jdbc:sqlite:minimarket.db`
+- **Dialecto:** `org.hibernate.community.dialect.SQLiteDialect`
 
-## Project Structure
+## Estructura del Proyecto
 
-- `src/main/java/com/minimarket/model`: Domain entities (Product, Transaction).
-- `src/main/java/com/minimarket/service`: Business logic and Pattern implementations (Strategy, Observer, Factory).
-- `src/main/java/com/minimarket/controller`: Web controllers.
-- `src/main/java/com/minimarket/service/facade`: Facade pattern entry point.
-- `src/main/resources/templates`: Thymeleaf views.
+- `src/main/java/com/minimarket/model`: Entidades de dominio (Product, Transaction).
+- `src/main/java/com/minimarket/service`: Lógica de negocio e implementaciones de Patrones (Strategy, Observer, Factory).
+- `src/main/java/com/minimarket/controller`: Controladores Web.
+- `src/main/java/com/minimarket/service/facade`: Punto de entrada del patrón Facade.
+- `src/main/resources/templates`: Vistas Thymeleaf.
 
-## Testing
+## Pruebas
 
-To run the automated tests:
+Para ejecutar las pruebas automatizadas:
 
 ```bash
 ./mvnw clean test
 ```
 
-### Unit Tests
+### Pruebas Unitarias
 
-The project includes unit tests for the core service layer, verifying the correct implementation of business logic and design patterns:
+El proyecto incluye pruebas unitarias para la capa de servicio central, verificando la correcta implementación de la lógica de negocio y los patrones de diseño:
 
-- **ProductServiceTest**: Verifies CRUD operations for products.
-- **TransactionServiceTest**: Tests transaction creation, ensuring the **Factory**, **Strategy**, and **Observer** patterns work as expected.
-- **ReportServiceTest**: Validates report generation and the **Bridge** pattern integration.
-- **CustomUserDetailsServiceTest**: Tests user authentication logic.
-- **ProductTest**: Tests the **Builder** pattern for creating product instances.
-- **TransactionFactoryTest**: Verifies the **Factory Method** pattern for creating different transaction types.
+- **ProductServiceTest**: Verifica operaciones CRUD para productos.
+- **TransactionServiceTest**: Prueba la creación de transacciones, asegurando que los patrones **Factory**, **Strategy**, y **Observer** funcionen como se espera.
+- **ReportServiceTest**: Valida la generación de reportes y la integración del patrón **Bridge**.
+- **CustomUserDetailsServiceTest**: Prueba la lógica de autenticación de usuarios.
+- **ProductTest**: Prueba el patrón **Builder** para crear instancias de productos.
+- **TransactionFactoryTest**: Verifica el patrón **Factory Method** para crear diferentes tipos de transacciones.
