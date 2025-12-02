@@ -98,5 +98,14 @@ This project uses **SQLite** for persistence.
 To run the automated tests:
 
 ```bash
-./mvnw test
+./mvnw clean test
 ```
+
+### Unit Tests
+
+The project includes unit tests for the core service layer, verifying the correct implementation of business logic and design patterns:
+
+- **ProductServiceTest**: Verifies CRUD operations for products.
+- **TransactionServiceTest**: Tests transaction creation, ensuring the **Factory**, **Strategy**, and **Observer** patterns work as expected.
+- **ReportServiceTest**: Validates report generation and the **Bridge** pattern integration.
+- **CustomUserDetailsServiceTest**: Tests user authentication logic.
