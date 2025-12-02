@@ -1,5 +1,7 @@
+com/minimarket/service/factory/TransactionFactoryTest.class
+com/minimarket/service/ProductServiceTest.class
 com/minimarket/service/TransactionServiceTest.class
+com/minimarket/model/ProductTest.class
 com/minimarket/service/CustomUserDetailsServiceTest.class
 com/minimarket/service/ReportServiceTest.class
 com/minimarket/MinimarketApplicationTests.class
-com/minimarket/service/ProductServiceTest.class

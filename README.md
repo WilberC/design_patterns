@@ -109,3 +109,5 @@ The project includes unit tests for the core service layer, verifying the correc
 - **TransactionServiceTest**: Tests transaction creation, ensuring the **Factory**, **Strategy**, and **Observer** patterns work as expected.
 - **ReportServiceTest**: Validates report generation and the **Bridge** pattern integration.
 - **CustomUserDetailsServiceTest**: Tests user authentication logic.
+- **ProductTest**: Tests the **Builder** pattern for creating product instances.
+- **TransactionFactoryTest**: Verifies the **Factory Method** pattern for creating different transaction types.
