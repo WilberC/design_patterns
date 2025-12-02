@@ -1,0 +1,6 @@
+com/minimarket/service/CustomUserDetailsService.class
+com/minimarket/repository/UserRepository.class
+com/minimarket/config/SecurityConfig.class
+com/minimarket/MinimarketApplication.class
+com/minimarket/controller/LoginController.class
+com/minimarket/model/User.class
